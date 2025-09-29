@@ -2,5 +2,5 @@
   - [x] astro (static files)
   - [x] express (server)
 - [x] run declaratively (nixos module)
-- [ ] develop declaratively
+- [x] develop declaratively
   - [ ] direnv

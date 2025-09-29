@@ -1,0 +1,9 @@
+{
+  "type": "module",
+  "scripts": {
+    "dev": "conc --kill-others-on-fail --names 'astro,express' 'cd astro && npm run dev' 'cd express && npm run dev'"
+  },
+  "dependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

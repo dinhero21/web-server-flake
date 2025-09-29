@@ -8,17 +8,30 @@
     systems = [ "x86_64-linux" ];
     forAllSystems = function: nixpkgs.lib.genAttrs systems (system: function nixpkgs.legacyPackages.${system});
   in {
-    packages = forAllSystems (pkgs: {
-      default = pkgs.callPackage ./package.nix {};
+    packages = forAllSystems (pkgs: rec {
+      server = pkgs.callPackage ./server.nix {};
+      static-files = pkgs.callPackage ./static-files.nix {};
+      default = server;
     });
 
     nixosModules.default = { config, pkgs, ... }: {
       systemd.services.web-server = {
-        enable = true;
+        # auto-start
+        wantedBy = [ "multi-user.target" ];
+
         path = [ pkgs.nodejs pkgs.bash ];
-        serviceConfig.WorkingDirectory = self.packages.${pkgs.system}.default;
-        script = "npm run start";
+        serviceConfig.WorkingDirectory = self.packages.${pkgs.system}.server;
+        script = "NODE_ENV=production npm run start";
       };
     };
+
+    # The only differences compared to the auto devshell are python and gcc aren't included
+    devShells = forAllSystems (pkgs: {
+      default = pkgs.mkShellNoCC {
+        buildInputs = with pkgs; [
+          nodejs 
+        ];
+      };
+    });
   };
 }
